@@ -1,6 +1,6 @@
 export default class TabStorage {
 	constructor(sync = true, direction = 'both') {
-		this.guid = TabStorage.guid()
+		this._guid = TabStorage.guid()
 
 		if (!sessionStorage.getItem('tabStorage')) {
 			this.clear(false)
@@ -9,7 +9,7 @@ export default class TabStorage {
 		window.addEventListener('storage', this.eventHandler.bind(this))
 
 		if (sync) {
-			this.emit('sync', direction, localStorage.getItem('tabStorage'), direction === 'out' ? this.guid : undefined)
+			this.emit('sync', direction, localStorage.getItem('tabStorage'), direction === 'out' ? this._guid : undefined)
 		}
 
 		return new Proxy(this, {
@@ -21,7 +21,7 @@ export default class TabStorage {
 				}
 			}
 			, getOwnPropertyDescriptor: function(target, key) {
-				if (key === 'guid') {
+				if (key === '_guid') {
 					return {configurable: true, enumerable: false}
 				} else if (target.keys().includes(key)) {
 					return {configurable: true, enumerable: true}
@@ -82,7 +82,7 @@ export default class TabStorage {
 					this.setItem(key, value, false)
 					break
 				case 'sync':
-					if ((key === 'out' && (!guid || guid === this.guid)) || key === 'both') {
+					if ((key === 'out' && (!guid || guid === this._guid)) || key === 'both') {
 						this.setItems(value, false)
 					}
 					if (key === 'in' || key === 'both') {
