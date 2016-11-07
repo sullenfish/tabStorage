@@ -18,7 +18,7 @@ tabStorage.setItem('cheese', 'cheddar')
 // open a new tab with the same origin
 
 // import tabStorage to this tab
-import {TabStprage} from 'tabStorage.js'
+import {TabStorage} from 'tabStorage.js'
 
 // initialize
 window.tabStorage = new TabStorage()
