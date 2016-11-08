@@ -1,6 +1,7 @@
 export default class TabStorage {
-	constructor(sync = true, direction = 'both') {
+	constructor(sync = true, direction = 'both', logger = new NullConsole()) {
 		this._guid = TabStorage.guid()
+		this._log = logger
 
 		if (!sessionStorage.getItem('tabStorage')) {
 			this.clear(false)
@@ -21,7 +22,7 @@ export default class TabStorage {
 				}
 			}
 			, getOwnPropertyDescriptor: function(target, key) {
-				if (key === '_guid') {
+				if (key === '_guid' || key === '_log') {
 					return {configurable: true, enumerable: false}
 				} else if (target.keys().includes(key)) {
 					return {configurable: true, enumerable: true}
@@ -61,7 +62,7 @@ export default class TabStorage {
 
 	eventHandler(event) {
 		if (event.key === 'tabStorage') {
-			console.debug('received tabStorage')
+			this._log.debug('received tabStorage')
 		}
 		if (!event.newValue) {
 			return
@@ -70,15 +71,15 @@ export default class TabStorage {
 			const {message, key, value, guid} = JSON.parse(event.newValue)
 			switch (message) {
 				case 'clear':
-					console.debug('clear()')
+					this._log.debug('clear()')
 					this.clear(false)
 					break
 				case 'removeItem':
-					console.debug(`removeItem('${key}')`)
+					this._log.debug(`removeItem('${key}')`)
 					this.removeItem(key, false)
 					break
 				case 'setItem':
-					console.debug(`setItem('${key}', '${value}')`)
+					this._log.debug(`setItem('${key}', '${value}')`)
 					this.setItem(key, value, false)
 					break
 				case 'sync':
@@ -90,7 +91,7 @@ export default class TabStorage {
 					}
 					break
 				default:
-					console.debug(`${message} event unhandled`)
+					this._log.debug(`${message} event unhandled`)
 			}
 		}
 	}
@@ -168,4 +169,18 @@ export default class TabStorage {
 		}
 	}
 
+	values() {
+		return Object.values(JSON.parse(sessionStorage.getItem('tabStorage')))
+	}
+}
+
+class NullConsole {
+	constructor () {
+		const methods = [
+			'assert','clear','count','debug','dir','dirxml','error','group','groupEnd','info','log','markTimeline','profile','profileEnd','time','timeEnd','trace','warn'
+		]
+		methods.forEach(item => {
+			this[item] = () => {}
+		})
+	}
 }
