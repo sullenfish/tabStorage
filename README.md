@@ -24,7 +24,7 @@ import {TabStorage} from 'tabStorage.js'
 window.tabStorage = new TabStorage()
 
 // retrieve the stored value and assign it
-let cheese = tabStorage.getItem('cheese', 'cheddar')
+let cheese = tabStorage.getItem('cheese')
 
 // cheese === 'cheddar'
 
